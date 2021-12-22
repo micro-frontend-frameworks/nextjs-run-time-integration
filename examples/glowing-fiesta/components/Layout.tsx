@@ -96,7 +96,7 @@ const mdTheme = createTheme();
 
 function LayoutContent(props: Props) {
   const [open, setOpen] = React.useState(true);
-  const { pathname } = useRouter();
+  const { asPath } = useRouter();
   const toggleDrawer = () => {
     setOpen(!open);
   };
@@ -110,6 +110,30 @@ function LayoutContent(props: Props) {
   React.useEffect(() => {
     getApps();
   }, []);
+
+  const [currentApp, setCurrentApp] = React.useState("");
+
+  React.useEffect(() => {
+    let pageIndex = -1;
+
+    if (apps.length > 0) {
+      const appIndex = apps.findIndex((app) => {
+        const index = app.pages.findIndex(
+          (page) => page.path === asPath.replace("/", "")
+        );
+
+        if (index > -1) {
+          pageIndex = index;
+
+          return app;
+        }
+      });
+
+      if (appIndex > -1 && pageIndex > -1) {
+        setCurrentApp(apps[appIndex].pages[pageIndex].title);
+      }
+    }
+  }, [apps, asPath]);
 
   return (
     <ThemeProvider theme={mdTheme}>
@@ -140,9 +164,7 @@ function LayoutContent(props: Props) {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              {apps?.find((app) =>
-                app.pages.find((page) => page.path === pathname)
-              ) ?? "Not Found"}
+              {currentApp ?? "Not Found"}
             </Typography>
             <IconButton color="inherit">
               <Badge badgeContent={4} color="secondary">
