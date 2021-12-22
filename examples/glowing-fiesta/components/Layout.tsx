@@ -18,7 +18,7 @@ import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { ListItems } from "./ListItems";
 import { useRouter } from "next/router";
-// import tenantConfig from "../mf-config";
+import { getAppsConfig } from "../utils/remote";
 
 function Copyright(props: any) {
   return (
@@ -100,6 +100,16 @@ function LayoutContent(props: Props) {
   const toggleDrawer = () => {
     setOpen(!open);
   };
+  const [apps, setApps] = React.useState<
+    { pages: { path: string; title: string }[] }[]
+  >([]);
+  const getApps = async () => {
+    setApps(await getAppsConfig());
+  };
+
+  React.useEffect(() => {
+    getApps();
+  }, []);
 
   return (
     <ThemeProvider theme={mdTheme}>
@@ -130,8 +140,9 @@ function LayoutContent(props: Props) {
               noWrap
               sx={{ flexGrow: 1 }}
             >
-              {/* {tenantConfig.items.find((item) => item.route === pathname)
-                ?.title ?? "Not Found"} */}
+              {apps?.find((app) =>
+                app.pages.find((page) => page.path === pathname)
+              ) ?? "Not Found"}
             </Typography>
             <IconButton color="inherit">
               <Badge badgeContent={4} color="secondary">
@@ -155,7 +166,7 @@ function LayoutContent(props: Props) {
           </Toolbar>
           <Divider />
           <List>
-            <ListItems />
+            <ListItems apps={apps} />
           </List>
         </Drawer>
         <Box

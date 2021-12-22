@@ -7,7 +7,6 @@ import PeopleIcon from "@mui/icons-material/People";
 import BarChartIcon from "@mui/icons-material/BarChart";
 import LayersIcon from "@mui/icons-material/Layers";
 import { useRouter } from "next/router";
-// import tenantConfig from "../mf-config";
 
 const items = [
   <DashboardIcon key={"dashboard"} />,
@@ -32,18 +31,21 @@ function Item(props: ItemProps) {
   );
 }
 
-export function ListItems() {
+export function ListItems(props: ListItemsProps) {
+  const { apps } = props;
   const { push } = useRouter();
 
   return (
     <div>
-      {/* {tenantConfig.items.map((item) => (
-        <Item
-          key={item.pageName}
-          onClick={() => push(item.route)}
-          title={item.title}
-        />
-      ))} */}
+      {apps?.map((app) =>
+        app.pages.map((page) => (
+          <Item
+            key={page.title}
+            onClick={() => push(page.path)}
+            title={page.title}
+          />
+        ))
+      )}
     </div>
   );
 }
@@ -51,4 +53,8 @@ export function ListItems() {
 interface ItemProps {
   onClick: () => void;
   title: string;
+}
+
+interface ListItemsProps {
+  apps: { pages: { path: string; title: string }[] }[];
 }
